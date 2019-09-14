@@ -11,8 +11,8 @@
     "stopservice": "sudo systemctl stop exitpuzzles.zoltar.service"
   },
   "dependencies": {
-    "bluetooth-serial-port": "^2.2.4",
     "firebase": "^6.4.0",
+    "serialport": "^7.1.5",
     "winston": "^3.2.1"
   },
   "devDependencies": {},
