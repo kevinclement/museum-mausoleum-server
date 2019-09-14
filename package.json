@@ -1,0 +1,23 @@
+{
+  "name": "exitpuzzles-museum-zoltar",
+  "version": "0.0.2",
+  "description": "Code the run the control server software for exitpuzzles zoltar",
+  "author": "Kevin Clement <kevin.clement@gmail.com>",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "verbose": "DEBUG=true node index.js",
+    "ngrok": "node scripts/ngrok.updateConfig.js",
+    "stopservice": "sudo systemctl stop exitpuzzles.zoltar.service"
+  },
+  "dependencies": {
+    "bluetooth-serial-port": "^2.2.4",
+    "firebase": "^6.4.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinclement/exitpuzzles-museum-zoltar.git"
+  }
+}

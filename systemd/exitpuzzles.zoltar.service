@@ -1,0 +1,19 @@
+[Unit]
+Description=ExitPuzzles Zoltar node service
+After=syslog.target network.target
+
+[Service]
+User=pi
+Type=simple
+Restart=always
+RestartSec=7
+StandardOutput=null
+StandardError=null
+ExecStart=/usr/bin/node /home/pi/code/museum-zoltar/index.js
+ExecStop=/usr/bin/killall node
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+
+
