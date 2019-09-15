@@ -4,6 +4,7 @@ module.exports = class StairsManager extends Manager {
     constructor(opts) {
         let bt = new (require('./serial.direct'))({
             name: opts.name,
+            baudRate: 115200,
             logger: opts.logger,
             dev: '/dev/ttyUSB0'
         });
@@ -71,6 +72,7 @@ module.exports = class StairsManager extends Manager {
         });
 
         this.stairsRef = stairsRef
+        this.serial = bt;
         this.logger = opts.logger;
         this.level = 0
         this.solved = false
@@ -80,13 +82,6 @@ module.exports = class StairsManager extends Manager {
         this.volumeLow = 0
         this.volumeHigh = 0
         this.volumeWhosh = 0
-
-        // TODO: remove?
-        setTimeout(()=> {
-            bt.write('status', ()=>{
-                console.log('status written');
-            });
-        }, 1000)
     }
 
     stairsTest(snapshot, cb) {
@@ -108,6 +103,9 @@ module.exports = class StairsManager extends Manager {
     }
 
     connected() {
+        // Get the status from the device when we start
+        this.serial.write('status')
+
         this.stairsRef.update({
             isConnected: true
         })

@@ -12,7 +12,7 @@ module.exports = class SerialDirect {
         this.onLine = this.onLine.bind(this);
         this.buffer = new (require('./buffer'))(this.onLine);
 
-        this.port = new SerialPort(opts.dev, { baudRate:115200 });
+        this.port = new SerialPort(opts.dev, { baudRate:opts.baudRate });
         this.parser = new Readline({ delimiter: '\r\n' })
         this.dataReceived = this.dataReceived.bind(this);
         this.port.on('data', this.dataReceived);
@@ -21,8 +21,6 @@ module.exports = class SerialDirect {
 
     dataReceived(d) {
         var textChunk = d.toString('utf8');
-        console.log(`<< ${textChunk}`);
-
         this.buffer.onData(textChunk);
     }
 
@@ -30,7 +28,6 @@ module.exports = class SerialDirect {
         this.connectionStartTime = new Date();
         this.buffer.reset();
         
-        // TODO: work to do here?
         setTimeout(() => {
             this.logger.log(this.logPrefix + 'Connected.');
             this.open = true;
@@ -69,8 +66,6 @@ module.exports = class SerialDirect {
 
         this.port.write(msg + '\n')
 
-        // TODO: does port have callback?
-        
         // fake it
         setTimeout(() => {
             if (cb) cb();
