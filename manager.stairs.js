@@ -17,7 +17,10 @@ module.exports = class StairsManager extends Manager {
         super({ ...opts, bt: bt, handlers: handlers, incoming:incoming })
 
         // setup supported commands
-        handlers['stairs.test'] = this.stairsTest
+        handlers['stairs.drop'] = (s,cb) => { 
+            bt.write('drop');
+            cb();
+        }
         handlers['stairs.reboot'] = (s,cb) => { 
             bt.write('reboot');
             cb();
