@@ -18,7 +18,10 @@ module.exports = class StairsManager extends Manager {
 
         // setup supported commands
         handlers['stairs.test'] = this.stairsTest
-        handlers['stairs.reset'] = (s,cb) => { bt.write('reset');cb(); }
+        handlers['stairs.reboot'] = (s,cb) => { 
+            bt.write('reboot');
+            cb();
+        }
 
         // setup supported device output parsing
         incoming.push(
