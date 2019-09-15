@@ -4,7 +4,7 @@ module.exports = class MummyManager extends Manager {
     constructor(opts) {
 
         // TODO: switch to real device
-        let bt = new (require('./bluetooth.mock'))({
+        let bt = new (require('./serial.mock'))({
             name: opts.name,
             address: '3C:71:BF:6C:73:A6',
             channel: 1,
