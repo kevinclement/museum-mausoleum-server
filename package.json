@@ -1,14 +1,15 @@
 {
-  "name": "exitpuzzles-museum-zoltar",
+  "name": "museum-mausoleum-server",
   "version": "0.0.2",
-  "description": "Code the run the control server software for exitpuzzles zoltar",
+  "description": "Code the run the control server software for exitpuzzles tomb",
   "author": "Kevin Clement <kevin.clement@gmail.com>",
   "private": true,
   "scripts": {
     "start": "node index.js",
     "verbose": "DEBUG=true node index.js",
-    "ngrok": "node scripts/ngrok.updateConfig.js",
-    "stopservice": "sudo systemctl stop exitpuzzles.zoltar.service"
+
+    "stop": "sudo systemctl stop exitpuzzles.tomb.service",
+    "service": "sudo systemctl start exitpuzzles.tomb.service"
   },
   "dependencies": {
     "firebase": "^6.4.0",
@@ -18,6 +19,6 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kevinclement/exitpuzzles-museum-zoltar.git"
+    "url": "git+https://github.com/kevinclement/museum-mausoleum-server.git"
   }
 }

@@ -1,5 +1,5 @@
 [Unit]
-Description=ExitPuzzles Zoltar node service
+Description=ExitPuzzles Tomb node service
 After=syslog.target network.target
 
 [Service]
@@ -9,7 +9,7 @@ Restart=always
 RestartSec=7
 StandardOutput=null
 StandardError=null
-ExecStart=/usr/bin/node /home/pi/code/museum-zoltar/index.js
+ExecStart=/usr/bin/node /home/pi/code/tomb/index.js
 ExecStop=/usr/bin/killall node
 Environment=NODE_ENV=production
 
