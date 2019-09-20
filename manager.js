@@ -64,8 +64,13 @@ module.exports = class Manager {
                 if (snapshot.val().command == hp) {
                   this.runningOp = snapshot
                   this.logger.log(this.logPrefix + 'handling ' + op.command + ' ...')
+                  
+                  // mark it received since all handlers would need to do it
+                  snapshot.ref.update({ 'received': (new Date()).toString() });
+
                   this.handlers[hp](snapshot, () => {
                     this.activity()
+                    snapshot.ref.update({ 'completed': (new Date()).toString() });
                     this.runningOp = null;
                   })
                 }
