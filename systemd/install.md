@@ -1,14 +1,21 @@
 ### Auto start node app
 ```
-copy exitpuzzles.zoltar.service into /etc/systemd/system/
+sudo copy exitpuzzles.tomb.service /etc/systemd/system/
 
-systemctl enable exitpuzzles.zoltar.service
-systemctl start exitpuzzles.zoltar.service
+# install service
+sudo systemctl enable exitpuzzles.tomb.service
+
+# start service
+sudo systemctl start exitpuzzles.tomb.service
+
+# to check status
+sudo systemctl status exitpuzzles.tomb.service
+
 ```
 
 Afterwards, should be able to 'shutdown -r now' and see it come online with ssh and node service
 
 ### Start/Stop to run by hand
 ```
-sudo systemctl stop exitpuzzles.zoltar.service
+sudo systemctl stop exitpuzzles.tomb.service
 ```
