@@ -25,6 +25,14 @@ module.exports = class StairsManager extends Manager {
             bt.write('reboot');
             cb();
         }
+        handlers['stairs.increment'] = (s,cb) => { 
+            bt.write('level');
+            cb();
+        }
+        handlers['stairs.unsolvable'] = (s,cb) => { 
+            bt.write('unsolvable');
+            cb();
+        }
 
         // setup supported device output parsing
         incoming.push(
@@ -35,34 +43,37 @@ module.exports = class StairsManager extends Manager {
                     let p = s.split(':');
                     switch(p[0]) {
                         case "level": 
-                            this.level = p[1];
-                            break;
+                            this.level = p[1]
+                            break
                         case "solved": 
-                            this.solved = (p[1] === 'true');
-                            break;
+                            this.solved = (p[1] === 'true')
+                            break
                         case "bowl": 
-                            this.bowl = (p[1] === 'true');
-                            break;
+                            this.bowl = (p[1] === 'true')
+                            break
                         case "magnet": 
-                            this.magnet = (p[1] === 'true');
-                            break;
+                            this.magnet = (p[1] === 'true')
+                            break
                         case "magnetLight":
-                            this.magnetLight = (p[1] === 'true');
-                            break;
+                            this.magnetLight = (p[1] === 'true')
+                            break
                         case "volumeLow":
                             this.volumeLow = parseInt(p[1])
-                            break;
+                            break
                         case "volumeHigh":
                             this.volumeHigh = parseInt(p[1])
-                            break;
+                            break
                         case "volumeWhosh":
                             this.volumeWhosh = parseInt(p[1])
-                            break;
+                            break
+                        case "unsolvable":
+                            this.unsolvable = (p[1] === 'true')
+                            break
                     }
                 })
                 
-                this.logger.log(this.logPrefix + 'status updated');
-                this.logger.log(`${this.logPrefix}level: ${this.level} solved: ${this.solved} bowl: ${this.bowl} magnet: ${this.magnet} magnetLight: ${this.magnetLight} volumeLow: ${this.volumeLow} volumeHigh: ${this.volumeHigh} volumeWhosh: ${this.volumeWhosh}`)
+                this.logger.log(this.logPrefix + 'status updated')
+                this.logger.log(`${this.logPrefix}level: ${this.level} solved: ${this.solved} bowl: ${this.bowl} magnet: ${this.magnet} magnetLight: ${this.magnetLight} volumeLow: ${this.volumeLow} volumeHigh: ${this.volumeHigh} volumeWhosh: ${this.volumeWhosh} unsolvable: ${this.unsolvable}`)
 
                 opts.fb.db.ref('museum/stairs').update({
                     level: this.level,
@@ -72,14 +83,15 @@ module.exports = class StairsManager extends Manager {
                     magnetLight: this.magnetLight,
                     volumeLow: this.volumeLow,
                     volumeHigh: this.volumeHigh,
-                    volumeWhosh: this.volumeWhosh
+                    volumeWhosh: this.volumeWhosh,
+                    unsolvable: this.unsolvable
                 })
             }
         });
 
         this.stairsRef = stairsRef
-        this.serial = bt;
-        this.logger = opts.logger;
+        this.serial = bt
+        this.logger = opts.logger
         this.level = 0
         this.solved = false
         this.bowl = false
@@ -88,11 +100,7 @@ module.exports = class StairsManager extends Manager {
         this.volumeLow = 0
         this.volumeHigh = 0
         this.volumeWhosh = 0
-    }
-
-    stairsTest(snapshot, cb) {
-        console.log("stairs test function!");
-        cb();
+        this.unsolvable = false
     }
 
     activity() {
