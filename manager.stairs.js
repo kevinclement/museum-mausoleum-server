@@ -25,8 +25,12 @@ module.exports = class StairsManager extends Manager {
             bt.write('reboot');
             cb();
         }
-        handlers['stairs.increment'] = (s,cb) => { 
-            bt.write('level');
+        handlers['stairs.up'] = (s,cb) => { 
+            bt.write('up');
+            cb();
+        }
+        handlers['stairs.down'] = (s,cb) => { 
+            bt.write('down');
             cb();
         }
         handlers['stairs.unsolvable'] = (s,cb) => { 
