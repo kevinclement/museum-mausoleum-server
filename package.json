@@ -5,11 +5,12 @@
   "author": "Kevin Clement <kevin.clement@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "node index.js",
+    "debug": "node index.js",
     "verbose": "DEBUG=true node index.js",
 
     "stop": "sudo systemctl stop exitpuzzles.tomb.service",
-    "service": "sudo systemctl start exitpuzzles.tomb.service"
+    "start": "sudo systemctl start exitpuzzles.tomb.service",
+    "status": "sudo systemctl status exitpuzzles.tomb.service"
   },
   "dependencies": {
     "firebase": "^6.4.0",
