@@ -1,60 +1,76 @@
 let Manager = require('./manager')
 
-module.exports = class MummyManager extends Manager {
+module.exports = class MummyuManager extends Manager {
     constructor(opts) {
-
-        // TODO: switch to real device
-        let bt = new (require('./serial.mock'))({
+        let bt = new (require('./serial.direct'))({
             name: opts.name,
-            address: '3C:71:BF:6C:73:A6',
-            channel: 1,
-            logger: opts.logger
+            baudRate: 115200,
+            logger: opts.logger,
+            dev: '/dev/ttyUSB1'
         });
 
-        let mummyRef = opts.fb.db.ref('museum/mummy')
+        let ref = opts.fb.db.ref('museum/mummy')
 
-        // setup supported device output parsing
-        let incoming = [
-          {
-            pattern:/count (.*)/,
-            match: (m) => {
-                // do some updates 
-                // m[1]
-            }
-          }
-        ]
+        let incoming = [];
         let handlers = {};
 
         super({ ...opts, bt: bt, handlers: handlers, incoming:incoming })
 
         // setup supported commands
-        handlers['mummy.test'] = this.mummyTest
-        handlers['mummy.set'] = this.mummyTest
+        handlers['mummy.solve'] = (s,cb) => { 
+            bt.write('solve');
+            cb();
+        }
+        handlers['mummy.reboot'] = (s,cb) => { 
+            bt.write('reboot');
+            cb();
+        }
 
-        this.mummyRef = mummyRef
-        this.logger = opts.logger;
-    }
+        // setup supported device output parsing
+        incoming.push(
+        {
+            pattern:/.*status=(.*)/,
+            match: (m) => {
+                m[1].split(',').forEach((s)=> {
+                    let p = s.split(':');
+                    switch(p[0]) {
+                        case "solved": 
+                            this.solved = (p[1] === 'true')
+                            break
+                    }
+                })
 
-    mummyTest(snapshot, cb) {
-        console.log("mummy test function!");
-        cb();
+                opts.fb.db.ref('museum/mummy').update({
+                    opened: this.solved
+                })
+            }
+        });
+
+        this.ref = ref
+        this.serial = bt
+        this.logger = opts.logger
+
+        this.solved = false
     }
 
     activity() {
-         this.mummyRef.update({
+         this.ref.update({
              lastActivity: (new Date()).toLocaleString()
         })
     }
 
     connecting() {
         // NOTE: while connecting, mark device as disabled, since it defaults to that
-        this.mummyRef.update({
+        this.ref.update({
             isConnected: false
         })
     }
 
     connected() {
-        this.mummyRef.update({
+        // Get the status from the device when we start
+        this.serial.write('status')
+
+        this.ref.update({
             isConnected: true
         })
     }

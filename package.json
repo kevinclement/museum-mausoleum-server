@@ -5,7 +5,7 @@
   "author": "Kevin Clement <kevin.clement@gmail.com>",
   "private": true,
   "scripts": {
-    "debug": "node index.js",
+    "dev": "node index.js",
     "verbose": "DEBUG=true node index.js",
 
     "stop": "sudo systemctl stop exitpuzzles.tomb.service",
