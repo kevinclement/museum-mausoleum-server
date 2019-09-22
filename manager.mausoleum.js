@@ -92,8 +92,7 @@ module.exports = class MausoleumManager extends Manager {
     }
 
     connected() {
-        // Get the status from the device when we start
-        this.serial.write('status')
+        // NOTE: no need to ask for status, since its printed when we start
 
         this.ref.update({
             isConnected: true

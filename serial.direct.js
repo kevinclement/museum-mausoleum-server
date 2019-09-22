@@ -6,6 +6,7 @@ module.exports = class SerialDirect {
         this.logger = opts.logger;
         this.outputCallback = undefined;
         this.logPrefix = 'direct: ' + opts.name + ': ';
+        this.connectTimeout = opts.connectTimeout ? opts.connectTimeout : 500;
 
         this.open = false;
         this.connectionStartTime = null;
@@ -33,7 +34,7 @@ module.exports = class SerialDirect {
             this.open = true;
             this.connectionStartTime = null;
             if (cb) cb();
-        }, 500)
+        }, this.connectTimeout)
     }
 
     setOutputCallback(cb) {
