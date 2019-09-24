@@ -6,7 +6,7 @@ module.exports = class MummyManager extends Manager {
             name: opts.name,
             baudRate: 115200,
             logger: opts.logger,
-            dev: '/dev/ttyUSB1'
+            dev: '/dev/ttyMUMMY'
         });
 
         let ref = opts.fb.db.ref('museum/mummy')

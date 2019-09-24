@@ -6,7 +6,7 @@ module.exports = class StairsManager extends Manager {
             name: opts.name,
             baudRate: 115200,
             logger: opts.logger,
-            dev: '/dev/ttyUSB0'
+            dev: '/dev/ttySTAIRS'
         });
 
         let stairsRef = opts.fb.db.ref('museum/stairs')

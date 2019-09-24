@@ -6,7 +6,7 @@ module.exports = class MausoleumManager extends Manager {
             name: opts.name,
             baudRate: 9600,
             logger: opts.logger,
-            dev: '/dev/ttyUSB2'
+            dev: '/dev/ttyMAUSOLEUM'
         });
 
         let ref = opts.fb.db.ref('museum/mausoleum')
