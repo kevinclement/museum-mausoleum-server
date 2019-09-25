@@ -1,6 +1,6 @@
 ### Auto start node app
 ```
-sudo copy exitpuzzles.tomb.service /etc/systemd/system/
+sudo cp exitpuzzles.tomb.service /etc/systemd/system/
 
 # install service
 sudo systemctl enable exitpuzzles.tomb.service
