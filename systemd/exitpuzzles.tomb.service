@@ -7,13 +7,14 @@ User=pi
 Type=simple
 Restart=always
 RestartSec=7
-StandardOutput=null
-StandardError=null
+#StandardOutput=null
+#StandardError=null
 ExecStart=/usr/bin/node /home/pi/code/server/index.js
-ExecStop=/usr/bin/killall node
+# Output to syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=exitpuzzles-tomb
 Environment=NODE_ENV=production
 
 [Install]
 WantedBy=multi-user.target
-
-
