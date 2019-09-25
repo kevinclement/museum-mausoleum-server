@@ -36,6 +36,9 @@ module.exports = class MummyManager extends Manager {
                     switch(p[0]) {
                         case "solved": 
                             this.solved = (p[1] === 'true')
+                            if (this.solved) {
+                                this.opened()
+                            }
                             break
                     }
                 })
@@ -46,11 +49,19 @@ module.exports = class MummyManager extends Manager {
             }
         });
 
+        this.fb = opts.fb
         this.ref = ref
         this.serial = bt
         this.logger = opts.logger
 
         this.solved = false
+    }
+
+    opened() {
+        // when the mummy is opened we should turn the laser off after 1 minute
+        setTimeout(() => {
+            this.fb.db.ref('museum/operations').push({ command: 'laser.disable', created: (new Date()).getTime()});
+        }, 5000)
     }
 
     activity() {
