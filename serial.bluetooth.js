@@ -86,7 +86,7 @@ module.exports = class Bluetooth {
 
         this.logger.log(this.logPrefix + '> ' + msg);
 
-        this.rfcomm.write(new Buffer(msg, 'utf-8'), function(err, bytesWritten) {
+        this.rfcomm.write(Buffer.from(msg, 'utf-8'), function(err, bytesWritten) {
             if (err) this.logger.logger.error(this.logPrefix + err);
 
             if (cb) cb(err);
