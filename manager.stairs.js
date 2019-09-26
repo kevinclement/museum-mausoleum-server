@@ -9,7 +9,7 @@ module.exports = class StairsManager extends Manager {
             dev: '/dev/ttySTAIRS'
         });
 
-        let stairsRef = opts.fb.db.ref('museum/stairs')
+        let ref = opts.fb.db.ref('museum/devices/stairs')
 
         let incoming = [];
         let handlers = {};
@@ -44,7 +44,7 @@ module.exports = class StairsManager extends Manager {
             pattern:/.*status=(.*)/,
             match: (m) => {
                 m[1].split(',').forEach((s)=> {
-                    let p = s.split(':');
+                    let p = s.split(/:(.+)/);
                     switch(p[0]) {
                         case "level": 
                             this.level = p[1]
@@ -73,13 +73,25 @@ module.exports = class StairsManager extends Manager {
                         case "unsolvable":
                             this.unsolvable = (p[1] === 'true')
                             break
+                        case "version": 
+                            this.version = p[1]
+                            break
+                        case "gitDate": 
+                            this.gitDate = p[1]
+                            break 
+                        case "buildDate": 
+                            this.buildDate = p[1]
+                            break
                     }
                 })
-                
-                this.logger.log(this.logPrefix + 'status updated')
-                this.logger.log(`${this.logPrefix}level: ${this.level} solved: ${this.solved} bowl: ${this.bowl} magnet: ${this.magnet} magnetLight: ${this.magnetLight} volumeLow: ${this.volumeLow} volumeHigh: ${this.volumeHigh} volumeWhosh: ${this.volumeWhosh} unsolvable: ${this.unsolvable}`)
 
-                opts.fb.db.ref('museum/stairs').update({
+                ref.child('info/build').update({
+                    version: this.version,
+                    date: this.buildDate,
+                    gitDate: this.gitDate
+                })
+
+                ref.update({
                     level: this.level,
                     solved: this.solved,
                     bowl: this.bowl,
@@ -93,9 +105,14 @@ module.exports = class StairsManager extends Manager {
             }
         });
 
-        this.stairsRef = stairsRef
+        this.ref = ref
         this.serial = bt
         this.logger = opts.logger
+
+        this.version = "unknown"
+        this.gitDate = "unknown"
+        this.buildDate = "unknown"
+
         this.level = 0
         this.solved = false
         this.bowl = false
@@ -108,14 +125,14 @@ module.exports = class StairsManager extends Manager {
     }
 
     activity() {
-         this.stairsRef.update({
+        this.ref.child('info').update({
              lastActivity: (new Date()).toLocaleString()
         })
     }
 
     connecting() {
         // NOTE: while connecting, mark device as disabled, since it defaults to that
-        this.stairsRef.update({
+        this.ref.child('info').update({
             isConnected: false
         })
     }
@@ -124,7 +141,7 @@ module.exports = class StairsManager extends Manager {
         // Get the status from the device when we start
         this.serial.write('status')
 
-        this.stairsRef.update({
+        this.ref.child('info').update({
             isConnected: true
         })
     }

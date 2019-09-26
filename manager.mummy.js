@@ -32,7 +32,7 @@ module.exports = class MummyManager extends Manager {
             pattern:/.*status=(.*)/,
             match: (m) => {
                 m[1].split(',').forEach((s)=> {
-                    let p = s.split(':');
+                    let p = s.split(/:(.+)/);
                     switch(p[0]) {
                         case "solved": 
                             this.solved = (p[1] === 'true')
@@ -68,11 +68,12 @@ module.exports = class MummyManager extends Manager {
         this.ref = ref
         this.serial = bt
         this.logger = opts.logger
-
-        this.solved = false
+        
         this.version = "unknown"
         this.gitDate = "unknown"
         this.buildDate = "unknown"
+
+        this.solved = false
     }
 
     opened() {
