@@ -9,7 +9,7 @@ module.exports = class MausoleumManager extends Manager {
             dev: '/dev/ttyMAUSOLEUM'
         });
 
-        let ref = opts.fb.db.ref('museum/mausoleum')
+        let ref = opts.fb.db.ref('museum/devices/mausoleum')
 
         let incoming = [];
         let handlers = {};
@@ -52,10 +52,25 @@ module.exports = class MausoleumManager extends Manager {
                         case "idol_5": 
                             this.idol_5 = (p[1] === 'true')
                             break
+                        case "version": 
+                            this.version = p[1]
+                            break
+                        case "gitDate": 
+                            this.gitDate = p[1]
+                            break 
+                        case "buildDate": 
+                            this.buildDate = p[1]
+                            break
                     }
                 })
 
-                opts.fb.db.ref('museum/mausoleum').update({
+                ref.child('info/build').update({
+                    version: this.version,
+                    date: this.buildDate,
+                    gitDate: this.gitDate
+                })
+
+                ref.update({
                     solved: this.solved,
                     idol_1: this.idol_1,
                     idol_2: this.idol_2,
@@ -70,6 +85,10 @@ module.exports = class MausoleumManager extends Manager {
         this.serial = bt
         this.logger = opts.logger
 
+        this.version = "unknown"
+        this.gitDate = "unknown"
+        this.buildDate = "unknown"
+
         this.solved = false
         this.idol_1 = false
         this.idol_2 = false
@@ -79,14 +98,14 @@ module.exports = class MausoleumManager extends Manager {
     }
 
     activity() {
-         this.ref.update({
+        this.ref.child('info').update({
              lastActivity: (new Date()).toLocaleString()
         })
     }
 
     connecting() {
         // NOTE: while connecting, mark device as disabled, since it defaults to that
-        this.ref.update({
+        this.ref.child('info').update({
             isConnected: false
         })
     }
@@ -94,8 +113,9 @@ module.exports = class MausoleumManager extends Manager {
     connected() {
         // NOTE: no need to ask for status, since its printed when we start
 
-        this.ref.update({
-            isConnected: true
+        this.ref.child('info').update({
+            isConnected: true,
+            lastActivity: (new Date()).toLocaleString()
         })
     }
 }

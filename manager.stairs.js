@@ -142,7 +142,8 @@ module.exports = class StairsManager extends Manager {
         this.serial.write('status')
 
         this.ref.child('info').update({
-            isConnected: true
+            isConnected: true,
+            lastActivity: (new Date()).toLocaleString()
         })
     }
 }
