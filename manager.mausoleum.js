@@ -89,6 +89,7 @@ module.exports = class MausoleumManager extends Manager {
         this.ref = ref
         this.serial = bt
         this.logger = opts.logger
+        this.audio = opts.audio
 
         this.version = "unknown"
         this.gitDate = "unknown"
@@ -103,7 +104,9 @@ module.exports = class MausoleumManager extends Manager {
     }
 
     solvedIt() {
-        console.log('it solved, playing sound now');
+        this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
+        this.audio.play("finale.wav", (err) => {
+        })
     }
 
     activity() {
