@@ -35,7 +35,12 @@ module.exports = class MausoleumManager extends Manager {
                     let p = s.split(/:(.+)/);
                     switch(p[0]) {
                         case "solved": 
-                            this.solved = (p[1] === 'true')
+                            let s = p[1] === 'true';
+                            // trigger solved behavior
+                            if (!this.solved && s) {
+                                this.solvedIt();
+                            } 
+                            this.solved = s;
                             break
                         case "idol_1": 
                             this.idol_1 = (p[1] === 'true')
@@ -95,6 +100,10 @@ module.exports = class MausoleumManager extends Manager {
         this.idol_3 = false
         this.idol_4 = false
         this.idol_5 = false
+    }
+
+    solvedIt() {
+        console.log('it solved, playing sound now');
     }
 
     activity() {

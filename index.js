@@ -1,10 +1,11 @@
 let fb = new (require('./firebase'))
 let logger = new (require('./logging'))
+let audio = new (require('./audio'))({ logger: logger })
 
 let managers = [];
 managers.push(new (require('./manager.mummy'))({ name: 'mummy', logger: logger, fb: fb }))
 managers.push(new (require('./manager.stairs'))({ name: 'stairs', logger: logger, fb: fb }))
-managers.push(new (require('./manager.mausoleum'))({ name: 'mausoleum', logger: logger, fb: fb }))
+managers.push(new (require('./manager.mausoleum'))({ name: 'mausoleum', logger: logger, fb: fb, audio:audio }))
 
 // might want to turn this off while doing dev, so I have a flag for it
 let ENABLE_FIREBASE_LOGS = true;
