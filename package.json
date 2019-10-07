@@ -7,13 +7,14 @@
   "scripts": {
     "dev": "node index.js",
     "verbose": "DEBUG=true node index.js",
-
     "stop": "sudo systemctl stop exitpuzzles.tomb.service",
     "start": "sudo systemctl start exitpuzzles.tomb.service",
+    "restart": "sudo systemctl restart exitpuzzles.tomb.service",
     "status": "sudo systemctl status exitpuzzles.tomb.service"
   },
   "dependencies": {
     "firebase": "^6.4.0",
+    "play-sound": "^1.1.3",
     "serialport": "^7.1.5",
     "winston": "^3.2.1"
   },
