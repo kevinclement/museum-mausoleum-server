@@ -25,6 +25,15 @@ module.exports = class MausoleumManager extends Manager {
             bt.write('reboot');
             cb();
         }
+        handlers['mausoleum.failSound'] = (s,cb) => {
+            this.logger.log(this.logPrefix + 'playing fail sound now...')
+            this.audio.play("fail.wav", (err) => {})
+            cb();
+        }
+        handlers['mausoleum.unsolvable'] = (s,cb) => {
+            console.log('unsolvable');
+            cb();
+        }
 
         // setup supported device output parsing
         incoming.push(
