@@ -31,7 +31,7 @@ module.exports = class MausoleumManager extends Manager {
             cb();
         }
         handlers['mausoleum.unsolvable'] = (s,cb) => {
-            console.log('unsolvable');
+            bt.write('unsolvable');
             cb();
         }
 
@@ -50,6 +50,9 @@ module.exports = class MausoleumManager extends Manager {
                                 this.solvedIt();
                             } 
                             this.solved = s;
+                            break
+                        case "unsolvable": 
+                            this.unsolvable = (p[1] === 'true')
                             break
                         case "idol_1": 
                             this.idol_1 = (p[1] === 'true')
@@ -86,6 +89,7 @@ module.exports = class MausoleumManager extends Manager {
 
                 ref.update({
                     solved: this.solved,
+                    unsolvable: this.unsolvable,
                     idol_1: this.idol_1,
                     idol_2: this.idol_2,
                     idol_3: this.idol_3,
@@ -105,6 +109,7 @@ module.exports = class MausoleumManager extends Manager {
         this.buildDate = "unknown"
 
         this.solved = false
+        this.unsolvable = false
         this.idol_1 = false
         this.idol_2 = false
         this.idol_3 = false
