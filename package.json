@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node index.js",
     "verbose": "DEBUG=true node index.js",
+    "tail": "tail -f /var/log/syslog | grep exitpuzzles-tomb",
     "stop": "sudo systemctl stop exitpuzzles.tomb.service",
     "start": "sudo systemctl start exitpuzzles.tomb.service",
     "restart": "sudo systemctl restart exitpuzzles.tomb.service",
