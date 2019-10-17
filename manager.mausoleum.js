@@ -18,6 +18,8 @@ module.exports = class MausoleumManager extends Manager {
 
         // setup supported commands
         handlers['mausoleum.solve'] = (s,cb) => {
+            this.solved = true;
+            this.solvedIt();
             bt.write('solve');
             cb();
         }
