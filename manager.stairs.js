@@ -2,40 +2,65 @@ let Manager = require('./manager')
 
 module.exports = class StairsManager extends Manager {
     constructor(opts) {
-        let bt = new (require('./serial.direct'))({
-            name: opts.name,
-            baudRate: 115200,
-            logger: opts.logger,
-            dev: '/dev/ttySTAIRS'
-        });
-
-        let ref = opts.fb.db.ref('museum/devices/stairs')
-
         let incoming = [];
         let handlers = {};
 
-        super({ ...opts, bt: bt, handlers: handlers, incoming:incoming })
+        let ref = opts.fb.db.ref('museum/devices/stairs')
+
+        super({ 
+            ...opts,
+            ref: ref,
+            dev:'/dev/ttySTAIRS',
+            baudRate: 115200,
+            handlers: handlers,
+            incoming:incoming,
+        })
+
+        // ask for status once we connect
+        this.on('connected', () => {
+            this.write('status')
+        });
 
         // setup supported commands
-        handlers['stairs.drop'] = (s,cb) => { 
-            bt.write('drop');
-            cb();
+        handlers['stairs.drop'] = (s,cb) => {
+            this.write('drop', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
         handlers['stairs.reboot'] = (s,cb) => { 
-            bt.write('reboot');
-            cb();
+            this.write('reboot', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
-        handlers['stairs.up'] = (s,cb) => { 
-            bt.write('up');
-            cb();
+        handlers['stairs.up'] = (s,cb) => {
+            this.write('up', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
-        handlers['stairs.down'] = (s,cb) => { 
-            bt.write('down');
-            cb();
+        handlers['stairs.down'] = (s,cb) => {
+            this.write('down', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
-        handlers['stairs.unsolvable'] = (s,cb) => { 
-            bt.write('unsolvable');
-            cb();
+        handlers['stairs.unsolvable'] = (s,cb) => {
+            this.write('unsolvable', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
 
         // setup supported device output parsing
@@ -46,6 +71,16 @@ module.exports = class StairsManager extends Manager {
                 m[1].split(',').forEach((s)=> {
                     let p = s.split(/:(.+)/);
                     switch(p[0]) {
+                        case "version": 
+                            this.version = p[1]
+                            break
+                        case "gitDate": 
+                            this.gitDate = p[1]
+                            break 
+                        case "buildDate": 
+                            this.buildDate = p[1]
+                            break
+
                         case "level": 
                             this.level = p[1]
                             break
@@ -73,15 +108,6 @@ module.exports = class StairsManager extends Manager {
                         case "unsolvable":
                             this.unsolvable = (p[1] === 'true')
                             break
-                        case "version": 
-                            this.version = p[1]
-                            break
-                        case "gitDate": 
-                            this.gitDate = p[1]
-                            break 
-                        case "buildDate": 
-                            this.buildDate = p[1]
-                            break
                     }
                 })
 
@@ -105,10 +131,6 @@ module.exports = class StairsManager extends Manager {
             }
         });
 
-        this.ref = ref
-        this.serial = bt
-        this.logger = opts.logger
-
         this.version = "unknown"
         this.gitDate = "unknown"
         this.buildDate = "unknown"
@@ -122,28 +144,8 @@ module.exports = class StairsManager extends Manager {
         this.volumeHigh = 0
         this.volumeWhosh = 0
         this.unsolvable = false
-    }
 
-    activity() {
-        this.ref.child('info').update({
-             lastActivity: (new Date()).toLocaleString()
-        })
-    }
-
-    connecting() {
-        // NOTE: while connecting, mark device as disabled, since it defaults to that
-        this.ref.child('info').update({
-            isConnected: false
-        })
-    }
-
-    connected() {
-        // Get the status from the device when we start
-        this.serial.write('status')
-
-        this.ref.child('info').update({
-            isConnected: true,
-            lastActivity: (new Date()).toLocaleString()
-        })
+        // now connect to serial
+        this.connect()
     }
 }

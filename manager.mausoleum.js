@@ -2,30 +2,38 @@ let Manager = require('./manager')
 
 module.exports = class MausoleumManager extends Manager {
     constructor(opts) {
-        let bt = new (require('./serial.direct'))({
-            name: opts.name,
-            baudRate: 9600,
-            logger: opts.logger,
-            dev: '/dev/ttyMAUSOLEUM'
-        });
-
-        let ref = opts.fb.db.ref('museum/devices/mausoleum')
-
         let incoming = [];
         let handlers = {};
 
-        super({ ...opts, bt: bt, handlers: handlers, incoming:incoming })
+        let ref = opts.fb.db.ref('museum/devices/mausoleum')
+
+        super({ 
+            ...opts,
+            ref: ref,
+            dev:'/dev/ttyMAUSOLEUM',
+            baudRate: 9600,
+            handlers: handlers,
+            incoming:incoming,
+        })
 
         // setup supported commands
         handlers['mausoleum.solve'] = (s,cb) => {
             this.solved = true;
             this.solvedIt();
-            bt.write('solve');
-            cb();
+            this.write('solve', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
-            bt.write('reboot');
-            cb();
+            this.write('reboot', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
         handlers['mausoleum.failSound'] = (s,cb) => {
             this.logger.log(this.logPrefix + 'playing fail sound now...')
@@ -33,8 +41,12 @@ module.exports = class MausoleumManager extends Manager {
             cb();
         }
         handlers['mausoleum.unsolvable'] = (s,cb) => {
-            bt.write('unsolvable');
-            cb();
+            this.write('unsolvable', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
         }
 
         // setup supported device output parsing
@@ -45,6 +57,16 @@ module.exports = class MausoleumManager extends Manager {
                 m[1].split(',').forEach((s)=> {
                     let p = s.split(/:(.+)/);
                     switch(p[0]) {
+                        case "version": 
+                            this.version = p[1]
+                            break
+                        case "gitDate": 
+                            this.gitDate = p[1]
+                            break 
+                        case "buildDate": 
+                            this.buildDate = p[1]
+                            break
+
                         case "solved": 
                             let s = p[1] === 'true';
                             // trigger solved behavior
@@ -71,15 +93,6 @@ module.exports = class MausoleumManager extends Manager {
                         case "idol_5": 
                             this.idol_5 = (p[1] === 'true')
                             break
-                        case "version": 
-                            this.version = p[1]
-                            break
-                        case "gitDate": 
-                            this.gitDate = p[1]
-                            break 
-                        case "buildDate": 
-                            this.buildDate = p[1]
-                            break
                     }
                 })
 
@@ -101,9 +114,6 @@ module.exports = class MausoleumManager extends Manager {
             }
         });
 
-        this.ref = ref
-        this.serial = bt
-        this.logger = opts.logger
         this.audio = opts.audio
 
         this.version = "unknown"
@@ -117,33 +127,13 @@ module.exports = class MausoleumManager extends Manager {
         this.idol_3 = false
         this.idol_4 = false
         this.idol_5 = false
+
+        // now connect to serial
+        this.connect()
     }
 
     solvedIt() {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
-        this.audio.play("finale.wav", (err) => {
-        })
-    }
-
-    activity() {
-        this.ref.child('info').update({
-             lastActivity: (new Date()).toLocaleString()
-        })
-    }
-
-    connecting() {
-        // NOTE: while connecting, mark device as disabled, since it defaults to that
-        this.ref.child('info').update({
-            isConnected: false
-        })
-    }
-
-    connected() {
-        // NOTE: no need to ask for status, since its printed when we start
-
-        this.ref.child('info').update({
-            isConnected: true,
-            lastActivity: (new Date()).toLocaleString()
-        })
+        this.audio.play("finale.wav", (err) => {})
     }
 }
