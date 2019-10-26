@@ -11,6 +11,7 @@ module.exports = class MausoleumManager extends EventEmitter {
         this.audio = opts.audio
         this.ref = opts.fb.db.ref('museum/devices/mausoleum')
         this.logger = opts.logger
+        this.logPrefix =  'mausoleum: ' + opts.name + ': '
 
         this.solved = false
         this.unsolvable = false
@@ -22,7 +23,7 @@ module.exports = class MausoleumManager extends EventEmitter {
 
         this.opts = new OptsHandler({
             logger: opts.logger,
-            name: opts.name,
+            name: 'mausoleum',
             handlers: handlers
         })
         
@@ -151,6 +152,14 @@ module.exports = class MausoleumManager extends EventEmitter {
             idol_4: this.idol_4,
             idol_5: this.idol_5
         })
+
+        if (!this.solved && this.idol_1 && this.idol_2 && this.idol_3 && this.idol_4 && this.idol_5) {
+            if (this.unsolvable) {
+                this.logger.log(this.logPrefix + 'WARN: idols were solved, but unsolvable is enabled.  Ignored.')
+            } else {
+                this.solvedIt()
+            }
+        }
     }
 
     handle(snapshot) {
