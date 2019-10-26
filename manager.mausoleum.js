@@ -77,6 +77,7 @@ module.exports = class MausoleumManager extends EventEmitter {
             this.solvedIt(cb);
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
+            // NOTE: not rebooting other devices since they don't have state
             this.lights.write('reboot', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -133,6 +134,10 @@ module.exports = class MausoleumManager extends EventEmitter {
     }
 
     statusChanged(s) {
+        this.ref.child('info').update({
+            lastActivity: (new Date()).toLocaleString()
+        })
+
         this.ref.update({
             idol_1: this.idol_1,
             idol_2: this.idol_2,
