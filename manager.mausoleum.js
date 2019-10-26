@@ -34,6 +34,26 @@ module.exports = class MausoleumManager extends EventEmitter {
             incoming: incoming
         })
 
+        let rfid1 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-1', dev: '/dev/ttyRFID1', baudRate:9600 })
+        let rfid2 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-2', dev: '/dev/ttyRFID2', baudRate:9600 })
+        let rfid3 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-3', dev: '/dev/ttyRFID3', baudRate:9600 })
+
+        // setup rfid status events
+        rfid1.on('status', (s) => { 
+            this.idol_1 = s.idol_1
+            this.statusChanged();
+        })
+        rfid2.on('status', (s) => {
+            this.idol_2 = s.idol_2
+            this.idol_3 = s.idol_3
+            this.statusChanged();
+        })
+        rfid3.on('status', (s) => {
+            this.idol_4 = s.idol_4
+            this.idol_5 = s.idol_5
+            this.statusChanged();
+        })
+
         // setup serial events
         this.lights.on('connected', () => {
             this.ref.child('info').update({
@@ -46,8 +66,6 @@ module.exports = class MausoleumManager extends EventEmitter {
                 lastActivity: (new Date()).toLocaleString()
            })
         })
-
-        // TODO: do for other devices??
 
         // mark in db not connected before we connect
         this.ref.child('info').update({
@@ -95,6 +113,9 @@ module.exports = class MausoleumManager extends EventEmitter {
         });
 
         this.lights.connect()
+        rfid1.connect()
+        rfid2.connect()
+        rfid3.connect()
     }
 
     solvedIt(cb) {
@@ -109,6 +130,16 @@ module.exports = class MausoleumManager extends EventEmitter {
                 cb()
             }
         });
+    }
+
+    statusChanged(s) {
+        this.ref.update({
+            idol_1: this.idol_1,
+            idol_2: this.idol_2,
+            idol_3: this.idol_3,
+            idol_4: this.idol_4,
+            idol_5: this.idol_5
+        })
     }
 
     handle(snapshot) {
