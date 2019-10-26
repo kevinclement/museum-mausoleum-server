@@ -99,21 +99,6 @@ module.exports = class MausoleumManager extends EventEmitter {
             cb()
         }
 
-        // setup supported device output parsing
-        incoming.push(
-        {
-            pattern:/.*status=(.*)/,
-            match: (m) => {
-                m[1].split(',').forEach((s)=> {
-                    let p = s.split(/:(.+)/);
-                    switch(p[0]) {
-                        case "solved": 
-                            break
-                    }
-                })
-            }
-        });
-
         this.lights.connect()
         rfid1.connect()
         rfid2.connect()
