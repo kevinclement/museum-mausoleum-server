@@ -10,10 +10,11 @@ module.exports = class MausoleumManager extends Manager {
         super({ 
             ...opts,
             ref: ref,
+            name: 'mausoleum', 
             dev:'/dev/ttyMAUSOLEUM',
             baudRate: 9600,
             handlers: handlers,
-            incoming:incoming,
+            incoming: incoming,
         })
 
         // setup supported commands
@@ -127,9 +128,6 @@ module.exports = class MausoleumManager extends Manager {
         this.idol_3 = false
         this.idol_4 = false
         this.idol_5 = false
-
-        // now connect to serial
-        this.connect()
     }
 
     solvedIt() {
