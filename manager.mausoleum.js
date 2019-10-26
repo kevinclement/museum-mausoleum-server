@@ -1,35 +1,65 @@
-let Manager = require('./manager')
+const EventEmitter = require('events');
+const Serial = require('./serial')
+const OptsHandler = require('./optsHandler')
 
-module.exports = class MausoleumManager extends Manager {
+module.exports = class MausoleumManager extends EventEmitter {
     constructor(opts) {
+        super();
         let incoming = [];
         let handlers = {};
 
-        let ref = opts.fb.db.ref('museum/devices/mausoleum')
+        this.audio = opts.audio
+        this.ref = opts.fb.db.ref('museum/devices/mausoleum')
+        this.logger = opts.logger
 
-        super({ 
-            ...opts,
-            ref: ref,
+        this.solved = false
+        this.unsolvable = false
+        this.idol_1 = false
+        this.idol_2 = false
+        this.idol_3 = false
+        this.idol_4 = false
+        this.idol_5 = false
+
+        this.opts = new OptsHandler({
+            logger: opts.logger,
+            name: opts.name,
+            handlers: handlers
+        })
+        
+        this.lights = new Serial({ 
+            logger: opts.logger,
             name: 'mausoleum', 
             dev:'/dev/ttyMAUSOLEUM',
             baudRate: 9600,
-            handlers: handlers,
-            incoming: incoming,
+            incoming: incoming
+        })
+
+        // setup serial events
+        this.lights.on('connected', () => {
+            this.ref.child('info').update({
+                isConnected: true,
+                lastActivity: (new Date()).toLocaleString()
+            })
+        })
+        this.lights.on('activity', () => {
+            this.ref.child('info').update({
+                lastActivity: (new Date()).toLocaleString()
+           })
+        })
+
+        // TODO: do for other devices??
+
+        // mark in db not connected before we connect
+        this.ref.child('info').update({
+            isConnected: false
         })
 
         // setup supported commands
         handlers['mausoleum.solve'] = (s,cb) => {
-            this.solved = true;
-            this.solvedIt();
-            this.write('solve', err => {
-                if (err) {
-                    s.ref.update({ 'error': err });
-                }
-                cb()
-            });
+            this.solvedIt(cb);
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
-            this.write('reboot', err => {
+            this.lights.write('reboot', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
                 }
@@ -42,12 +72,11 @@ module.exports = class MausoleumManager extends Manager {
             cb();
         }
         handlers['mausoleum.unsolvable'] = (s,cb) => {
-            this.write('unsolvable', err => {
-                if (err) {
-                    s.ref.update({ 'error': err });
-                }
-                cb()
-            });
+            this.unsolvable = !this.unsolvable
+            this.ref.update({
+                unsolvable: this.unsolvable
+            })
+            cb()
         }
 
         // setup supported device output parsing
@@ -58,80 +87,31 @@ module.exports = class MausoleumManager extends Manager {
                 m[1].split(',').forEach((s)=> {
                     let p = s.split(/:(.+)/);
                     switch(p[0]) {
-                        case "version": 
-                            this.version = p[1]
-                            break
-                        case "gitDate": 
-                            this.gitDate = p[1]
-                            break 
-                        case "buildDate": 
-                            this.buildDate = p[1]
-                            break
-
                         case "solved": 
-                            let s = p[1] === 'true';
-                            // trigger solved behavior
-                            if (!this.solved && s) {
-                                this.solvedIt();
-                            } 
-                            this.solved = s;
-                            break
-                        case "unsolvable": 
-                            this.unsolvable = (p[1] === 'true')
-                            break
-                        case "idol_1": 
-                            this.idol_1 = (p[1] === 'true')
-                            break
-                        case "idol_2": 
-                            this.idol_2 = (p[1] === 'true')
-                            break
-                        case "idol_3": 
-                            this.idol_3 = (p[1] === 'true')
-                            break
-                        case "idol_4": 
-                            this.idol_4 = (p[1] === 'true')
-                            break
-                        case "idol_5": 
-                            this.idol_5 = (p[1] === 'true')
                             break
                     }
-                })
-
-                ref.child('info/build').update({
-                    version: this.version,
-                    date: this.buildDate,
-                    gitDate: this.gitDate
-                })
-
-                ref.update({
-                    solved: this.solved,
-                    unsolvable: this.unsolvable,
-                    idol_1: this.idol_1,
-                    idol_2: this.idol_2,
-                    idol_3: this.idol_3,
-                    idol_4: this.idol_4,
-                    idol_5: this.idol_5
                 })
             }
         });
 
-        this.audio = opts.audio
-
-        this.version = "unknown"
-        this.gitDate = "unknown"
-        this.buildDate = "unknown"
-
-        this.solved = false
-        this.unsolvable = false
-        this.idol_1 = false
-        this.idol_2 = false
-        this.idol_3 = false
-        this.idol_4 = false
-        this.idol_5 = false
+        this.lights.connect()
     }
 
-    solvedIt() {
+    solvedIt(cb) {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
-        this.audio.play("finale.wav", (err) => {})
+        this.solved = true;
+        //this.audio.play("finale.wav", (err) => {})
+        this.lights.write('solve', err => {
+            if (err) {
+                s.ref.update({ 'error': err });
+            }
+            if (cb) { 
+                cb()
+            }
+        });
+    }
+
+    handle(snapshot) {
+        this.opts.handle(snapshot)
     }
 }
