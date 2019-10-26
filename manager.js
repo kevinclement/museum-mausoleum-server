@@ -1,7 +1,6 @@
 const EventEmitter = require('events');
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
-const Delimiter = require('@serialport/parser-delimiter')
 
 module.exports = class Manager extends EventEmitter {
     constructor(opts) {
