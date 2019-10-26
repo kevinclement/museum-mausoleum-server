@@ -17,7 +17,7 @@ module.exports = class StairsManager extends Manager {
         })
 
         // ask for status once we connect
-        this.on('connected', () => {
+        this.serial.on('connected', () => {
             this.write('status')
         });
 
@@ -144,8 +144,5 @@ module.exports = class StairsManager extends Manager {
         this.volumeHigh = 0
         this.volumeWhosh = 0
         this.unsolvable = false
-
-        // now connect to serial
-        this.connect()
     }
 }

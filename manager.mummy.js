@@ -17,7 +17,7 @@ module.exports = class MummyManager extends Manager {
         })
 
         // ask for status once we connect
-        this.on('connected', () => {
+        this.serial.on('connected', () => {
             this.write('status')
         });
 
@@ -86,9 +86,6 @@ module.exports = class MummyManager extends Manager {
         this.buildDate = "unknown"
 
         this.solved = false
-
-        // now connect to serial
-        this.connect()
     }
 
     opened() {
