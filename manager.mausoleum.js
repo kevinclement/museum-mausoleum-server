@@ -78,6 +78,7 @@ module.exports = class MausoleumManager extends EventEmitter {
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
             // NOTE: not rebooting other devices since they don't have state
+            this.reset()
             this.lights.write('reboot', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -92,9 +93,7 @@ module.exports = class MausoleumManager extends EventEmitter {
         }
         handlers['mausoleum.unsolvable'] = (s,cb) => {
             this.unsolvable = !this.unsolvable
-            this.ref.update({
-                unsolvable: this.unsolvable
-            })
+            this.statusChanged()
             cb()
         }
 
@@ -121,16 +120,21 @@ module.exports = class MausoleumManager extends EventEmitter {
 
     solvedIt(cb) {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
-        this.solved = true;
-        //this.audio.play("finale.wav", (err) => {})
+        this.solved = true
+        this.statusChanged()
+        // TODO: turn sound back on
+        // this.audio.play("finale.wav", (err) => {})
         this.lights.write('solve', err => {
-            if (err) {
-                s.ref.update({ 'error': err });
-            }
             if (cb) { 
                 cb()
             }
         });
+    }
+    
+    reset(cb) {
+        this.solved = false
+        this.unsolvable = false
+        this.statusChanged()
     }
 
     statusChanged(s) {
@@ -139,6 +143,8 @@ module.exports = class MausoleumManager extends EventEmitter {
         })
 
         this.ref.update({
+            solved: this.solved,
+            unsolvable: this.unsolvable,
             idol_1: this.idol_1,
             idol_2: this.idol_2,
             idol_3: this.idol_3,
