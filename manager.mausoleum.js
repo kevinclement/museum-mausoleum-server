@@ -8,10 +8,11 @@ module.exports = class MausoleumManager extends EventEmitter {
         let incoming = [];
         let handlers = {};
 
+        this.name = 'mausoleum'
         this.audio = opts.audio
         this.ref = opts.fb.db.ref('museum/devices/mausoleum')
         this.logger = opts.logger
-        this.logPrefix =  'mausoleum: ' + opts.name + ': '
+        this.logPrefix =  'manager: ' + this.name + ': '
 
         this.solved = false
         this.unsolvable = false
@@ -23,13 +24,13 @@ module.exports = class MausoleumManager extends EventEmitter {
 
         this.opts = new OptsHandler({
             logger: opts.logger,
-            name: 'mausoleum',
+            name: this.name,
             handlers: handlers
         })
         
         this.lights = new Serial({ 
             logger: opts.logger,
-            name: 'mausoleum', 
+            name: this.name,
             dev:'/dev/ttyMAUSOLEUM',
             baudRate: 9600,
             incoming: incoming
