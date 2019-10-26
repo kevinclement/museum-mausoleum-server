@@ -38,7 +38,7 @@ module.exports = class MausoleumManager extends Manager {
         }
         handlers['mausoleum.failSound'] = (s,cb) => {
             this.logger.log(this.logPrefix + 'playing fail sound now...')
-            this.audio.play("fail.wav", (err) => {})
+            this.audio.play("fail.wav", err => {})
             cb();
         }
         handlers['mausoleum.unsolvable'] = (s,cb) => {
