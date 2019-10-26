@@ -109,8 +109,7 @@ module.exports = class MausoleumManager extends EventEmitter {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
         this.solved = true
         this.statusChanged()
-        // TODO: turn sound back on
-        // this.audio.play("finale.wav", (err) => {})
+        this.audio.play("finale.wav", (err) => {})
         this.lights.write('solve', err => {
             if (cb) { 
                 cb()
