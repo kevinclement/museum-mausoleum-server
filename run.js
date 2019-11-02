@@ -30,4 +30,15 @@ module.exports = class Runs {
             this.logger.log(this.logPrefix + 'WARN: run not defined, not updating analytics')
         }
     }
+
+    stairsSolved(forced) {
+        if (this.run) {
+            this.run.child("events/stairs").update({
+                timestamp: (new Date()).toLocaleString(),
+                force: forced ? true : false
+            })
+        } else {
+            this.logger.log(this.logPrefix + 'WARN: run not defined, not updating analytics')
+        }
+    }
 }

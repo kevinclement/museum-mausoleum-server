@@ -24,6 +24,7 @@ module.exports = class StairsManager extends Manager {
 
         // setup supported commands
         handlers['stairs.drop'] = (s,cb) => {
+            this.forced = true
             this.write('drop', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -36,6 +37,7 @@ module.exports = class StairsManager extends Manager {
                 if (err) {
                     s.ref.update({ 'error': err });
                 }
+                this.forced = false
                 cb()
             });
         }
@@ -129,6 +131,10 @@ module.exports = class StairsManager extends Manager {
                     volumeWhosh: this.volumeWhosh,
                     unsolvable: this.unsolvable
                 })
+
+                if (this.solved) {
+                    this.run.stairsSolved(this.forced)
+                }
             }
         });
 
@@ -145,5 +151,7 @@ module.exports = class StairsManager extends Manager {
         this.volumeHigh = 0
         this.volumeWhosh = 0
         this.unsolvable = false
+
+        this.forced = false
     }
 }
