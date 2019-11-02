@@ -13,6 +13,7 @@ module.exports = class MausoleumManager extends EventEmitter {
         this.ref = opts.fb.db.ref('museum/devices/mausoleum')
         this.logger = opts.logger
         this.logPrefix =  'manager: ' + this.name + ': '
+        this.run = opts.run
 
         this.solved = false
         this.unsolvable = false
@@ -107,6 +108,7 @@ module.exports = class MausoleumManager extends EventEmitter {
 
     solvedIt(cb) {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
+        this.run.solved()
         this.solved = true
         this.statusChanged()
         this.audio.play("finale.wav", (err) => {})
