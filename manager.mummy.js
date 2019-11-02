@@ -24,6 +24,7 @@ module.exports = class MummyManager extends Manager {
 
         // setup supported commands
         handlers['mummy.solve'] = (s,cb) => {
+            this.forced = true
             this.write('solve', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -32,6 +33,7 @@ module.exports = class MummyManager extends Manager {
             });
         }
         handlers['mummy.reboot'] = (s,cb) => {
+            this.forced = false
             this.write('reboot', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -87,9 +89,13 @@ module.exports = class MummyManager extends Manager {
         this.buildDate = "unknown"
 
         this.solved = false
+        this.forced = false
     }
 
     opened() {
+        // update analytics
+        this.run.mummySolved(this.forced)
+
         // when the mummy is opened we should turn the laser off after 1 minute
         setTimeout(() => {
             this.fb.db.ref('museum/operations').push({ command: 'laser.disable', created: (new Date()).getTime()});

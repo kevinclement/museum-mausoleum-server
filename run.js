@@ -27,7 +27,7 @@ module.exports = class Runs {
             })
             this.run.update({ finished: (new Date()).toLocaleString() });
         } else {
-            this.logger.log(this.logPrefix + 'WARN: run not defined, not updating analytics')
+            this.logger.log(this.logPrefix + 'WARN: maus: run not defined, not updating analytics')
         }
     }
 
@@ -38,7 +38,18 @@ module.exports = class Runs {
                 force: forced ? true : false
             })
         } else {
-            this.logger.log(this.logPrefix + 'WARN: run not defined, not updating analytics')
+            this.logger.log(this.logPrefix + 'WARN: stairs: run not defined, not updating analytics')
+        }
+    }
+
+    mummySolved(forced) {
+        if (this.run) {
+            this.run.child("events/mummy").update({
+                timestamp: (new Date()).toLocaleString(),
+                force: forced ? true : false
+            })
+        } else {
+            this.logger.log(this.logPrefix + 'WARN: mummy: run not defined, not updating analytics')
         }
     }
 }
