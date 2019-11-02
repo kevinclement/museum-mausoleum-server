@@ -15,6 +15,7 @@ module.exports = class StairsManager extends Manager {
             handlers: handlers,
             incoming:incoming,
         })
+        this.run = opts.run
 
         // ask for status once we connect
         this.serial.on('connected', () => {

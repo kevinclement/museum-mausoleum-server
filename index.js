@@ -4,8 +4,8 @@ let audio = new (require('./audio'))({ logger: logger })
 let run = new (require('./run'))({ logger: logger, db:fb.db })
 
 let managers = [];
-managers.push(new (require('./manager.mummy'))({ name: 'mummy', logger: logger, fb: fb }))
-managers.push(new (require('./manager.stairs'))({ name: 'stairs', logger: logger, fb: fb }))
+managers.push(new (require('./manager.mummy'))({ name: 'mummy', logger: logger, fb: fb, run:run  }))
+managers.push(new (require('./manager.stairs'))({ name: 'stairs', logger: logger, fb: fb, run:run  }))
 managers.push(new (require('./manager.mausoleum'))({ logger: logger, fb: fb, audio:audio, run:run }))
 
 // might want to turn this off while doing dev, so I have a flag for it
