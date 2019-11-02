@@ -19,9 +19,13 @@ module.exports = class Runs {
         })
     }
 
-    solved() {
+    solved(forced) {
         if (this.run) {
-            this.run.update( { finished: (new Date()).toLocaleString() } )
+            this.run.child("events/mausoleum").update({
+                timestamp: (new Date()).toLocaleString(),
+                force: forced ? true : false
+            })
+            this.run.update({ finished: (new Date()).toLocaleString() });
         } else {
             this.logger.log(this.logPrefix + 'WARN: run not defined, not updating analytics')
         }

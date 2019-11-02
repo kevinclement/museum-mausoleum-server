@@ -77,7 +77,7 @@ module.exports = class MausoleumManager extends EventEmitter {
 
         // setup supported commands
         handlers['mausoleum.solve'] = (s,cb) => {
-            this.solvedIt(cb);
+            this.solvedIt(cb, true);
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
             // NOTE: not rebooting other devices since they don't have state
@@ -106,9 +106,9 @@ module.exports = class MausoleumManager extends EventEmitter {
         rfid3.connect()
     }
 
-    solvedIt(cb) {
+    solvedIt(cb, forced) {
         this.logger.log(this.logPrefix + 'SOLVED!!! playing finale sound now...')
-        this.run.solved()
+        this.run.solved(forced)
         this.solved = true
         this.statusChanged()
         this.audio.play("finale.wav", (err) => {})
