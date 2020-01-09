@@ -37,21 +37,21 @@ module.exports = class MausoleumManager extends EventEmitter {
             incoming: incoming
         })
 
-        let rfid1 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-1', dev: '/dev/ttyRFID1', baudRate:9600 })
-        let rfid2 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-2', dev: '/dev/ttyRFID2', baudRate:9600 })
-        let rfid3 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-3', dev: '/dev/ttyRFID3', baudRate:9600 })
+        this.rfid1 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-1', dev: '/dev/ttyRFID1', baudRate:9600 })
+        this.rfid2 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-2', dev: '/dev/ttyRFID2', baudRate:9600 })
+        this.rfid3 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-3', dev: '/dev/ttyRFID3', baudRate:9600 })
 
         // setup rfid status events
-        rfid1.on('status', (s) => { 
+        this.rfid1.on('status', (s) => { 
             this.idol_1 = s.idol_1
             this.statusChanged();
         })
-        rfid2.on('status', (s) => {
+        this.rfid2.on('status', (s) => {
             this.idol_2 = s.idol_2
             this.idol_3 = s.idol_3
             this.statusChanged();
         })
-        rfid3.on('status', (s) => {
+        this.rfid3.on('status', (s) => {
             this.idol_4 = s.idol_4
             this.idol_5 = s.idol_5
             this.statusChanged();
@@ -80,8 +80,22 @@ module.exports = class MausoleumManager extends EventEmitter {
             this.solvedIt(cb, true);
         }
         handlers['mausoleum.reboot'] = (s,cb) => {
-            // NOTE: not rebooting other devices since they don't have state
             this.reset()
+            this.rfid1.write('reboot', err => {
+                if (err) {
+                    this.logger.log(this.logPrefix + 'ERROR: RFID1 reset ' + err)
+                }
+            });
+            this.rfid2.write('reboot', err => {
+                if (err) {
+                    this.logger.log(this.logPrefix + 'ERROR: RFID2 reset ' + err)
+                }
+            });
+            this.rfid3.write('reboot', err => {
+                if (err) {
+                    this.logger.log(this.logPrefix + 'ERROR: RFID3 reset ' + err)
+                }
+            });
             this.lights.write('reboot', err => {
                 if (err) {
                     s.ref.update({ 'error': err });
@@ -101,9 +115,9 @@ module.exports = class MausoleumManager extends EventEmitter {
         }
 
         this.lights.connect()
-        rfid1.connect()
-        rfid2.connect()
-        rfid3.connect()
+        this.rfid1.connect()
+        this.rfid2.connect()
+        this.rfid3.connect()
     }
 
     solvedIt(cb, forced) {
