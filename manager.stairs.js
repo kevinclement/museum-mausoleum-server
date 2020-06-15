@@ -65,6 +65,14 @@ module.exports = class StairsManager extends Manager {
                 cb()
             });
         }
+        handlers['stairs.sensors'] = (s,cb) => {
+            this.write('sensors', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
+        }
 
         // setup supported device output parsing
         incoming.push(
@@ -111,6 +119,9 @@ module.exports = class StairsManager extends Manager {
                         case "unsolvable":
                             this.unsolvable = (p[1] === 'true')
                             break
+                        case "sensorsDisabled":
+                            this.sensorsDisabled = (p[1] === 'true')
+                            break                            
                     }
                 })
 
@@ -129,7 +140,8 @@ module.exports = class StairsManager extends Manager {
                     volumeLow: this.volumeLow,
                     volumeHigh: this.volumeHigh,
                     volumeWhosh: this.volumeWhosh,
-                    unsolvable: this.unsolvable
+                    unsolvable: this.unsolvable,
+                    sensorsDisabled: this.sensorsDisabled
                 })
 
                 if (this.solved) {
@@ -151,6 +163,7 @@ module.exports = class StairsManager extends Manager {
         this.volumeHigh = 0
         this.volumeWhosh = 0
         this.unsolvable = false
+        this.sensorsDisabled = false
 
         this.forced = false
     }
