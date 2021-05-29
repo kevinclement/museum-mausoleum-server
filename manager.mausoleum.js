@@ -51,6 +51,9 @@ module.exports = class MausoleumManager extends EventEmitter {
             this.idol_3 = s.idol_3
             this.statusChanged();
         })
+        this.rfid3.on('connected', () => {
+            this.rfid3.write('status', err => {} );
+        })
         this.rfid3.on('status', (s) => {
             this.idol_4 = s.idol_4
             this.idol_5 = s.idol_5
