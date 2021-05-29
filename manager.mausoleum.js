@@ -39,7 +39,7 @@ module.exports = class MausoleumManager extends EventEmitter {
 
         this.rfid1 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-1', dev: '/dev/ttyRFID1', baudRate:9600 })
         this.rfid2 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-2', dev: '/dev/ttyRFID2', baudRate:9600 })
-        this.rfid3 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-3', dev: '/dev/ttyRFID3', baudRate:9600 })
+        this.rfid3 = new (require('./serial.rfid'))({ logger: this.logger, name:'rfid-3', dev: '/dev/ttyRFID3', baudRate:115200 })
 
         // setup rfid status events
         this.rfid1.on('status', (s) => { 
