@@ -73,6 +73,14 @@ module.exports = class StairsManager extends Manager {
                 cb()
             });
         }
+        handlers['stairs.fail'] = (s,cb) => {
+            this.write('fail', err => {
+                if (err) {
+                    s.ref.update({ 'error': err });
+                }
+                cb()
+            });
+        }
 
         // setup supported device output parsing
         incoming.push(
